@@ -46,15 +46,17 @@ final class CustomCell: UITableViewCell {
     }
     
     private func settingsForImgProfile() {
-        imgProfile.frame = CGRect(x: 0, y: 0, width: 50, height: 50)
+        //imgProfile.frame = CGRect(x: 0, y: 0, width: 70, height: 70)
+        imgProfile.layer.cornerRadius = 35
+        imgProfile.clipsToBounds = true
         imgProfile.contentMode = .scaleAspectFit
         imgProfile.tintColor = #colorLiteral(red: 0.8039215803, green: 0.8039215803, blue: 0.8039215803, alpha: 1)
         imgProfile.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             imgProfile.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 25),
             imgProfile.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 20),
-            imgProfile.widthAnchor.constraint(equalToConstant: 50),
-            imgProfile.heightAnchor.constraint(equalToConstant: 50)
+            imgProfile.widthAnchor.constraint(equalToConstant: 70),
+            imgProfile.heightAnchor.constraint(equalToConstant: 70)
         ])
     }
     
@@ -66,8 +68,8 @@ final class CustomCell: UITableViewCell {
         titlePost.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             titlePost.leadingAnchor.constraint(equalTo: imgProfile.leadingAnchor, constant: 80),
-            titlePost.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
-            titlePost.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 30)
+            titlePost.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -65),
+            titlePost.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 20)
         ])
     }
     
@@ -79,7 +81,7 @@ final class CustomCell: UITableViewCell {
         NSLayoutConstraint.activate([
             bodyPost.topAnchor.constraint(equalTo: imgProfile.bottomAnchor, constant: 20),
             bodyPost.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 25),
-            bodyPost.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10)
+            bodyPost.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20)
         ])
     }
     
@@ -88,8 +90,8 @@ final class CustomCell: UITableViewCell {
         like.contentMode = .scaleAspectFit
         like.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            like.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 5),
-            like.trailingAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.trailingAnchor, constant: -10)
+            like.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 20),
+            like.trailingAnchor.constraint(equalTo: contentView.safeAreaLayoutGuide.trailingAnchor, constant: -20)
         ])
     }
     
@@ -97,11 +99,11 @@ final class CustomCell: UITableViewCell {
         return isLiked ? ( .red, UIImage(systemName: "heart.fill")!) : ( .gray, UIImage(systemName: "heart")!)
     }
     
-    func config(prfileImage: UIImage?, title: String?, body: String?, liked: Bool = false) {
+    func config(prfileImage: UIImage?, title: String?, body: String?, isLike: Bool) {
         imgProfile.image = prfileImage
         titlePost.text = title
         bodyPost.text = body
-        like.tintColor = statusLike(isLiked: liked).0
-        like.image = statusLike(isLiked: liked).1
+        like.tintColor = statusLike(isLiked: isLike).0
+        like.image = statusLike(isLiked: isLike).1
     }
 }

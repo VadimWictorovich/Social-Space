@@ -14,6 +14,7 @@ final class HomeCont: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupUI()
+        getData()
     }
     
     private func setupUI() {
@@ -21,14 +22,14 @@ final class HomeCont: UITableViewController {
         navigationController?.navigationBar.prefersLargeTitles = true
         tableView.separatorStyle = .none
         tableView.register(CustomCell.self, forCellReuseIdentifier: "cell")
-        tableView.rowHeight = 200
+        tableView.rowHeight = 250
+        setupRefreshControl()
 
     }
 
     // MARK: - Table view data source
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of rows
-        return 10
+        viewModel.postsFromCoreData.count
     }
 
     
@@ -36,45 +37,44 @@ final class HomeCont: UITableViewController {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as? CustomCell else {
             return UITableViewCell()
         }
-        cell.config(prfileImage: UIImage(systemName: "person.crop.circle"), title: "312323232323232323232323232323123", body: "1232323232323232323232323123123", liked: false)
+        let post = viewModel.postsFromCoreData[indexPath.row]
+        cell.config(prfileImage:UIImage(named: "p\(post.userId)") ?? UIImage(systemName: "person.crop.circle"),
+                    title: post.title,
+                    body: post.body,
+                    isLike: post.like)
         return cell
     }
     
-
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        viewModel.postsFromCoreData[indexPath.row].like.toggle()
+        CoreDataService.shared.saveData()
+        tableView.reloadRows(at: [indexPath], with: .automatic)
     }
-    */
-
-    /*
-    // Override to support editing the table view.
-    override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
+    
+    private func getData() {
+        viewModel.getContentFromCoreData { [weak self] in
+            self?.tableView.reloadData()
+        }
+        viewModel.getContentFromNet { [weak self] in
+            DispatchQueue.main.async {
+                self?.tableView.reloadData()
+            }
+        }
     }
-    */
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
+    
+    private func setupRefreshControl() {
+        refreshControl = UIRefreshControl()
+        refreshControl?.attributedTitle = NSAttributedString(string: "Загрузка данных...")
+        refreshControl?.addTarget(self, action: #selector(handleRefresh), for: .valueChanged)
+        tableView.refreshControl = refreshControl
     }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
+    
+    @objc private func handleRefresh() {
+        viewModel.getContentFromNet {
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+            }
+        }
+        refreshControl?.endRefreshing()
     }
-    */
-
-
 }
